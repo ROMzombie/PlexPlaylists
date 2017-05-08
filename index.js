@@ -15,15 +15,21 @@ var	config = require("./config"),
 app.set("view engine", "pug");
 
 app.get("/", function(req, res){
-	res.render("index", {} );
-});
-
-app.get("/playlists", function(req, res){
-	getPlaylists.then(function(result){ res.json(result); });
+	getPlaylists.then(function(result){ 
+		res.render("index", { 
+			serverName: config.server_name,
+			playlists: result });
+	});
 });
 
 app.get("/playlist/:id", function(req, res){
-	getPlaylist(req.params.id).then(function(result){ res.json(result); });
+	getPlaylist(req.params.id).then(function(result){ 
+		res.render("playlist", { 
+			serverName: config.server_name,
+			serverId: config.server_id,
+			playlistName: result.playlistName,
+			items: result.items });
+	});
 });
 
 app.listen(config.service_port);
@@ -44,8 +50,12 @@ function getPlaylistItems (id) {
 	var key = "/playlists/" + id + "/items";
 
 	return api.query(key).then(function(result){
-		return result.MediaContainer.Metadata;
+		return { 
+			playlistName: result.MediaContainer.title,
+			items: result.MediaContainer.Metadata 
+		};
 	}, function(error){
 		console.error("Could not get playlist entries");
 	});	
 }
+

@@ -3,5 +3,7 @@
 	"plex_username": "",
 	"plex_password": "",
 	"service_port": "9020",
-	"prefix": "@"
+	"prefix": "@",
+	"server_name": "",
+	"server_id": ""
 }
