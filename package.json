@@ -1,0 +1,19 @@
+{
+  "name": "plex-playlists",
+  "version": "1.0.0",
+  "description": "A node package to share Plex playlists",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "plex"
+  ],
+  "author": "Tom Scott <romzombie@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.2",
+    "plex-api": "^5.1.0",
+    "pug": "^2.0.0-rc.1"
+  }
+}
