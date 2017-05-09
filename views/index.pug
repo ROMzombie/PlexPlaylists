@@ -1,0 +1,8 @@
+html
+  head
+    title= "Playlists on "+ serverName
+  body
+    each playlist in playlists
+      a(href="/playlist/"+ playlist.ratingKey)
+        img(src="https://"+ plexAddress + ":" + plexPort + playlist.thumb)
+        p #{playlist.title.substring(1)}

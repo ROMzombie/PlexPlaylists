@@ -1,8 +1,0 @@
-html
-  head
-    title=#{serverName} Playlists
-  body
-    each playlist in playlists
-      a(href="/playlist/#{playlist.ratingKey}")
-	img(src=#{playlist.thumb})
-      	p #{playlist.title}

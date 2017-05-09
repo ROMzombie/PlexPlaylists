@@ -1,8 +1,0 @@
-html
-  head
-    title=#{playlistName} on #{serverName}
-  body
-    each item, index in items
-      a(href="https://app.plex.tv/web/app#!/server/#{serverId}/details?key=%2Flibrary%2Fmetadata%2F#{item.key}")
-        img(src="#{item.thumb}")
-        p #{item.title}

@@ -2,6 +2,7 @@
 	"plex_address": "",
 	"plex_username": "",
 	"plex_password": "",
+	"plex_port": "32400",
 	"service_port": "9020",
 	"prefix": "@",
 	"server_name": "",
