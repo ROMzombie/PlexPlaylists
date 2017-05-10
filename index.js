@@ -13,10 +13,6 @@ var	config = require("./config"),
 			product: "Plex Playlists" 
 		} });
 
-var 	lastUpdated = 0, 
-	playlists = {}, 
-	playlistItems = [];
-
 app.set("view engine", "pug");
 
 app.get("/", function(req, res){
@@ -45,17 +41,13 @@ app.get("/playlist/:id", function(req, res){
 app.listen(config.service_port);
 
 function getPlaylists() {
-	if(needsRefreshed()) {	
-		return api.query("/playlists").then(function(result){  
-			return playlists = result.MediaContainer.Metadata.filter(function(entry){
-				return entry.title.startsWith(config.prefix);
-			});
-		}, function(error){
-			console.error("Could not connect to server", error) 
+	return api.query("/playlists").then(function(result){  
+		return result.MediaContainer.Metadata.filter(function(entry){
+			return entry.title.startsWith(config.prefix);
 		});
-	} else {
-		return playlists;
-	}	
+	}, function(error){
+		console.error("Could not connect to server", error) 
+	});	
 }
 
 function getPlaylistItems (id) {
@@ -63,20 +55,12 @@ function getPlaylistItems (id) {
 	
 	var key = "/playlists/" + id + "/items";
 
-	if(needsRefreshed()){
-		return api.query(key).then(function(result){
-			return playlistItems[key] = { 
-				playlistName: result.MediaContainer.title,
-				items: result.MediaContainer.Metadata 
-			};
-		}, function(error){
-			console.error("Could not get playlist entries");
-		});
-	} else {
-		return playlistItems[key];
-	}	
-}
-
-function needsRefreshed() {
-	return lastUpdated < (new Date() - 100*60*5);
+	return api.query(key).then(function(result){
+		return { 
+			playlistName: result.MediaContainer.title,
+			items: result.MediaContainer.Metadata 
+		};
+	}, function(error){
+		console.error("Could not get playlist entries");
+	});	
 }
