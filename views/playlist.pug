@@ -7,7 +7,7 @@ html
     h1 #{playlistName.substring(1)}
     ul
       each item, index in items
-        a(href="https://app.plex.tv/web/app#!/server/"+ serverId +"/details?key="+ encodeURIComponent(item.key))
-          li.item  
-            // img(src="https://"+ plexAddress + ":" + plexPort + item.thumb)
-            p #{item.title}
+        - var image = '/image?key=' + item.thumb
+        - var imageStyle = 'background-image:url(' + image + ');background-size:contain;'
+        a(target="_blank" href="https://app.plex.tv/web/app#!/server/"+ serverId +"/details?key="+ encodeURIComponent(item.key))
+          li.item(style=imageStyle)

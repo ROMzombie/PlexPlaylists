@@ -1,4 +1,5 @@
 var	config = require("./config"),
+	http = require("http-request"),
 	express = require("express"),
 	app = express(),
  	PlexAPI = require("plex-api"),
@@ -38,6 +39,14 @@ app.get("/playlist/:id", function(req, res){
 	});
 });
 
+app.get("/image", function(req,res){
+	getImageFromPlexPy(req.query.key).then(function(result){
+		res.setHeader("content-type","image/jpg");
+		res.write(result);
+		res.end();
+	});
+});
+
 app.listen(config.service_port);
 
 function getPlaylists() {
@@ -63,4 +72,18 @@ function getPlaylistItems (id) {
 	}, function(error){
 		console.error("Could not get playlist entries");
 	});	
+}
+
+function getImageFromPlexPy(key) {
+	return new Promise(function(resolve, reject){
+		var url = "http://" 
+			+ config.plexpy_address + ":" + config.plexpy_port 
+			+ "/api/v2?apikey=" + config.plexpy_apikey 
+			+ "&cmd=pms_image_proxy&img=" + key
+			//+ "&width=150&height=255" 
+			+ "&fallback=poster"
+		http.get(url, function(error, response){
+			resolve(response.buffer);
+		});
+	});
 }

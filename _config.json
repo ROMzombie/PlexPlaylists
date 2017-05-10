@@ -6,5 +6,8 @@
 	"service_port": "9020",
 	"prefix": "@",
 	"server_name": "",
-	"server_id": ""
+	"server_id": "",
+	"plexpy_address": "",
+	"plexpy_port": "",
+	"plexpy_apikey": ""
 }

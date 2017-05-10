@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.15.2",
+    "http-request": "^0.7.0",
     "plex-api": "^5.1.0",
     "pug": "^2.0.0-rc.1"
   }
