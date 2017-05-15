@@ -1,11 +1,12 @@
 html
   head
     title= "Playlists on "+ serverName
-    include templates/head.pug
+    style
+      include styles.css
   body
     h1 #{"Playlists on "+ serverName}
-    ul.grid-container
+    ul
       each playlist in playlists
         a(href="/playlist/"+ playlist.ratingKey)
-          li.grid-100.mobile-grid-100.playlist
+          li.playlist
             p #{playlist.title.substring(1)}
