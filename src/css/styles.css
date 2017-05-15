@@ -26,15 +26,27 @@ li {
 	padding: 5px;
 }
 
-li.playlist {
-	width: 200px;
-	height: 40px;
+@media (max-width: 400px) {
+	li.playlist {
+		height: 40px;
+	}
+
+	li.item {
+		display: inline-block;
+		height: 100vw; /* 88px 140px */
+	}
 }
 
-li.item {
-	display: inline-block;
-	width: 88px;
-	height: 140px; 
+@media (min-width: 401px) {
+	li.playlist {
+		width: 200px;
+		height: 40px;
+	}
+
+	li.item {
+		display: inline-block;
+		height: 140px;
+	}
 }
 
 li.item::before {

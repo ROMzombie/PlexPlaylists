@@ -1,13 +1,13 @@
 html
   head
     title= playlistName.substring(1) +" on "+ serverName
-    style
-      include styles.css
+    include templates/head.pug
   body
-    h1 #{playlistName.substring(1)}
-    ul
+    h1 
+      a(href="/") &#8592; #{playlistName.substring(1)}
+    ul.grid-container
       each item, index in items
         - var image = '/image?key=' + item.thumb
-        - var imageStyle = 'background-image:url(' + image + ');background-size:contain;'
+        - var imageStyle = 'background-image:url(' + image + ');background-size:cover;'
         a(target="_blank" href="https://app.plex.tv/web/app#!/server/"+ serverId +"/details?key="+ encodeURIComponent(item.key))
-          li.item(style=imageStyle)
+          li.item.grid-10.mobile-grid-100(style=imageStyle)

@@ -16,6 +16,9 @@ var	config = require("./config"),
 
 app.set("view engine", "pug");
 
+// files in '/src' will be served from root
+app.use(express.static('src'));
+
 app.get("/", function(req, res){
 	getPlaylists().then(function(result){ 
 		res.render("index", { 

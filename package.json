@@ -1,20 +1,13 @@
 {
-  "name": "plex-playlists",
-  "version": "1.0.0",
-  "description": "A node package to share Plex playlists",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "name": "polymer-starter-kit",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "eslint": "^3.12.0",
+    "eslint-config-google": "^0.7.1",
+    "eslint-plugin-html": "^1.7.0"
   },
-  "keywords": [
-    "plex"
-  ],
-  "author": "Tom Scott <romzombie@gmail.com>",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^4.15.2",
-    "http-request": "^0.7.0",
-    "plex-api": "^5.1.0",
-    "pug": "^2.0.0-rc.1"
+  "scripts": {
+    "lint": "eslint . --ext js,html --ignore-path .gitignore",
+    "test": "npm run lint && polymer test"
   }
 }
