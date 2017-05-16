@@ -11,6 +11,7 @@
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="playlist-view.html">
 <link rel="import" href="icons.html">
 
 <dom-module id="plex-playlists">
@@ -55,15 +56,16 @@
     </style>
 
     <iron-ajax auto="" url="/api/playlists" last-response="{{playlists}}"></iron-ajax>
+    <iron-ajax auto="" url="/api/server" last-response="{{serverInfo}}"></iron-ajax>
 
     <app-location route="{{route}}"></app-location>
-    <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
+    <app-route route="{{route}}" pattern="/:page/:id" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
     <app-drawer-layout fullbleed="">
       <!-- Drawer content -->
       <app-drawer id="drawer" slot="drawer">
-        <app-toolbar>Playlists</app-toolbar>
-        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+        <app-toolbar>Plex Playlists</app-toolbar>
+        <iron-selector class="drawer-list" role="navigation">
           <template is="dom-repeat" items="[[playlists]]" as="playlist">
             <a href="/playlist/[[playlist.ratingKey]]">[[_trimPlaylistTitle(playlist.title)]]</a>
           </template>
@@ -76,14 +78,15 @@
         <app-header slot="header" condenses="" reveals="" effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="icons:menu" drawer-toggle=""></paper-icon-button>
-            <div main-title="">Plex Playlists</div>
+            <div main-title="">Movies</div>
           </app-toolbar>
         </app-header>
 
-        <iron-pages selected="[[page]]" attr-for-selected="playlistId" fallback-selection="error404" role="main">
-          
-          <playlist-view name="playlistView"></playlist-view>
-          <error-404 name="error404"></error-404>
+        <iron-pages id="pages" selected="[[playlistKey]]" attr-for-selected="id" fallback-selection="homeView" role="main">
+          <home-view id="homeView"></home-view>
+          <template is="dom-repeat" items="[[playlists]]" as="playlist">
+            <playlist-view id$="/playlist/[[playlist.ratingKey]]" playlist-id="[[playlist.ratingKey]]"></playlist-view>
+          </template>
         </iron-pages>
       </app-header-layout>
     </app-drawer-layout>
@@ -96,17 +99,15 @@
 
       static get properties() {
         return {
-          page: {
-            type: String,
-            reflectToAttribute: true,
-            observer: '_pageChanged',
-          },
+          playlistKey: {
+            type: String
+          }
         };
       }
 
       static get observers() {
         return [
-          '_routePageChanged(routeData.page)',
+          '_routePlaylistIdChanged(routeData.id)'
         ];
       }
 
@@ -114,36 +115,24 @@
         return String(title).substring(1);
       }
 
-      _routePageChanged(page) {
-        // Polymer 2.0 will call with `undefined` on initialization.
-        // Ignore until we are properly called with a string.
-        if (page === undefined) {
+      _routePlaylistIdChanged(playlistId) {
+        if (playlistId === undefined) {
           return;
         }
 
-        // If no page was found in the route data, page will be an empty string.
-        // Deault to 'view1' in that case.
-        this.page = page || 'playlist';
+        this.playlistKey = playlistId && playlistId.length > 0 
+          ? '/playlist/'+playlistId
+          : 'homeView';
 
-        // Close a non-persistent drawer when the page & route are changed.
+        if(this.playlistKey != 'homeView'){
+          Polymer.dom(this.root).querySelector("[id='"+this.playlistKey+"']")
+            .dispatchEvent(new CustomEvent("selected"));
+        }
+
         if (!this.$.drawer.persistent) {
           this.$.drawer.close();
         }
-      }
-
-      _pageChanged(page) {
-        // Load page import on demand. Show 404 page if fails
-        var resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
-        Polymer.importHref(
-            resolvedPageUrl,
-            null,
-            this._showPage404.bind(this),
-            true);
-      }
-
-      _showPage404() {
-        this.page = 'error404';
-      }
+      }      
     }
 
     window.customElements.define(PlexPlaylists.is, PlexPlaylists);

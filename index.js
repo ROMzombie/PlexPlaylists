@@ -17,6 +17,9 @@ var	config = require("./config"),
 app.set("view engine", "pug");
 
 app.use(express.static('build/default'));
+app.get('/playlist/:id', function(req, res){
+	res.redirect('/');
+});
 
 app.get("/api/server", function(req, res){
 	res.json({
@@ -42,7 +45,7 @@ app.get("/api/playlist/:id", function(req, res){
 	});
 });
 
-app.get("/image", function(req,res){
+app.get("/api/image", function(req,res){
 	getImageFromPlexPy(req.query.key).then(function(result){
 		res.setHeader("content-type","image/jpg");
 		res.write(result);
@@ -69,7 +72,7 @@ function getPlaylistItems (id) {
 
 	return api.query(key).then(function(result){
 		return { 
-			playlistName: result.MediaContainer.title,
+			title: result.MediaContainer.title,
 			items: result.MediaContainer.Metadata 
 		};
 	}, function(error){

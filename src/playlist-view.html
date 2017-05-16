@@ -1,4 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="playlist-view">
@@ -9,13 +10,18 @@
 
         padding: 10px;
       }
+      .card { display: inline-block; width: 100px; height: 180px; }
     </style>
+    <iron-ajax id="request"
+      url="/api/playlist/[[playlistId]]"
+      handle-as="json"
+      on-response="_handlePlaylistResponse"
+    ></iron-ajax>
 
-    <template is="dom-repeat" items="[[playlistItems]]" 
-      as="playlistItem" index-as="playlistItemNumber">
-      <div class="card">
-        <div class="circle">[[playlistItemNumber]]</div>
-        <h1>[[playlistItem.title]]</h1>
+    <template is="dom-repeat" items="[[items]]" as="item" index-as="itemNumber">
+      <div class="card" style="background-image:url('/api/image?key=[[item.thumb]]');background-size:cover;">
+        <!-- <div class="circle">[[itemNumber]]</div>
+        <h1>[[item.title]]</h1> -->
       </div>
     </template>
   </template>
@@ -23,8 +29,27 @@
   <script>
     class PlaylistView extends Polymer.Element {
       static get is() { return 'playlist-view'; }
-    }
 
+      static get properties() {
+        return { 
+          playlistId: { type: String },
+          title: { type: String, reflectToAttribute: true },
+          items: { type: Array }
+        }
+      }
+      ready() {
+        super.ready();
+        this.addEventListener('selected', e => this._selectedListener(e));
+      }    
+      _selectedListener(e){
+        this.$.request.generateRequest();
+      }
+      _handlePlaylistResponse(response){
+        var response = response.detail.__data.response; // this seems like the wrong way to access the data
+        this.items = response.items;
+        this.title = response.title;
+      };
+    }
     window.customElements.define(PlaylistView.is, PlaylistView);
   </script>
 </dom-module>
