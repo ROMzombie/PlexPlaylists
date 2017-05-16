@@ -16,26 +16,29 @@ var	config = require("./config"),
 
 app.set("view engine", "pug");
 
-app.get("/", function(req, res){
-	getPlaylists().then(function(result){ 
-		res.render("index", { 
-			serverName: config.server_name,
-			plexAddress: config.plex_address,
-			plexPort: config.plex_port,
-			playlists: result 
-		});
+app.use(express.static('build/default'));
+
+app.get("/api/server", function(req, res){
+	res.json({
+		serverName: config.server_name,
+		plexAddress: config.plex_address,
+		plexPort: config.plex_port,
+		serverId: config.server_id
 	});
 });
 
-app.get("/playlist/:id", function(req, res){
+app.get("/api/playlists", function(req, res){
+	getPlaylists().then(function(result){ 
+		res.json(result);
+	});
+});
+
+app.get("/api/playlist/:id", function(req, res){
 	getPlaylistItems(req.params.id).then(function(result){ 
-		res.render("playlist", { 
-			serverName: config.server_name,
-			plexAddress: config.plex_address,
-			serverId: config.server_id,
-			plexPort: config.plex_port,
+		res.json({ 
 			playlistName: result.playlistName,
-			items: result.items });
+			items: result.items 
+		});
 	});
 });
 
@@ -80,7 +83,6 @@ function getImageFromPlexPy(key) {
 			+ config.plexpy_address + ":" + config.plexpy_port 
 			+ "/api/v2?apikey=" + config.plexpy_apikey 
 			+ "&cmd=pms_image_proxy&img=" + key
-			//+ "&width=150&height=255" 
 			+ "&fallback=poster"
 		http.get(url, function(error, response){
 			resolve(response.buffer);

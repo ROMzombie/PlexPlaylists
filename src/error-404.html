@@ -1,0 +1,27 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<dom-module id="error-404">
+  <template>
+    <style>
+      :host {
+        display: block;
+
+        padding: 10px 20px;
+      }
+    </style>
+
+    <!--
+      If deploying in a folder replace href="/" with the full path to your site.
+      Such as: href=="http://polymerelements.github.io/polymer-starter-kit"
+    -->
+    Oops you hit a 404. <a href="/">Head back to home.</a>
+  </template>
+
+  <script>
+    class Error404 extends Polymer.Element {
+      static get is() { return 'error-404'; }
+    }
+
+    window.customElements.define(Error404.is, Error404);
+  </script>
+</dom-module>

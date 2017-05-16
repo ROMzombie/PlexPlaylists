@@ -1,0 +1,29 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="playlist-view">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+    </style>
+
+    <template is="dom-repeat" items="[[playlistItems]]" as="playlistItem" index-as="playlistItemNumber">
+      <div class="card">
+        <div class="circle">[[playlistItemNumber]]</div>
+        <h1>[[playlistItem.title]]</h1>
+      </div>
+    </template>
+  </template>
+
+  <script>
+    class PlaylistView extends Polymer.Element {
+      static get is() { return 'playlist-view'; }
+    }
+
+    window.customElements.define(PlaylistView.is, PlaylistView);
+  </script>
+</dom-module>
