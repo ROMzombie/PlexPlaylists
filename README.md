@@ -1,10 +1,19 @@
 # PlexPlaylists
 
 ## Setup
-1. Copy the _config.json to a new config.json file, and populate it with your configuration settings.
-2. npm install
-3. nodejs .
+1. cp _config.json config.json 
+2. nano config.json
+   (populate it with your configuration settings)
+3. npm install
+
+## Running
+1. nodejs .
+
+## Rebuilding UI
+1. npm install -g polymer-cli
+2. bower install
+3. polymer build
 
 ## Screenshots
-* ![Playlists](http://i.imgur.com/vSZ8i82.png)
-* ![Playlist Items](http://i.imgur.com/vSZ8i82.png)
+![Playlists](http://i.imgur.com/vSZ8i82.png)
+![Playlist Items](http://i.imgur.com/vSZ8i82.png)
