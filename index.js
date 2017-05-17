@@ -38,10 +38,7 @@ app.get("/api/playlists", function(req, res){
 
 app.get("/api/playlist/:id", function(req, res){
 	getPlaylistItems(req.params.id).then(function(result){ 
-		res.json({ 
-			playlistName: result.playlistName,
-			items: result.items 
-		});
+		res.json(result);
 	});
 });
 
@@ -70,7 +67,7 @@ function getPlaylistItems (id) {
 	
 	var key = "/playlists/" + id + "/items";
 
-	return api.query(key).then(function(result){
+	return api.query(key).then(function(result){               
 		return { 
 			title: result.MediaContainer.title,
 			items: result.MediaContainer.Metadata 

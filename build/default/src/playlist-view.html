@@ -10,15 +10,14 @@
 
         padding: 10px;
       }
-      .card { display: inline-block; width: 100px; height: 180px; }
+      .card { display: inline-block; width: 88px; height: 140px; }
     </style>
     <iron-ajax id="request" url="/api/playlist/[[playlistId]]" handle-as="json" on-response="_handlePlaylistResponse"></iron-ajax>
 
     <template is="dom-repeat" items="[[items]]" as="item" index-as="itemNumber">
-      <div class="card" style="background-image:url('/api/image?key=[[item.thumb]]');background-size:cover;">
-        <!-- <div class="circle">[[itemNumber]]</div>
-        <h1>[[item.title]]</h1> -->
-      </div>
+      <a target="_blank" href="https://app.plex.tv/web/app#!/server/[[serverInfo.serverId]]/details?key=[[_encodeKey(item.key)]]"><div class="card" style="background-image:url('/api/image?key=[[item.thumb]]');background-size:cover;">
+          <!-- <div class="circle">[[itemNumber]]</div><h1>[[item.title]]</h1> -->
+        </div></a>
     </template>
   </template>
 
@@ -29,8 +28,9 @@
       static get properties() {
         return { 
           playlistId: { type: String },
-          title: { type: String, reflectToAttribute: true },
-          items: { type: Array }
+          title: { type: String },
+          items: { type: Array },
+          serverInfo: { type: Object }
         }
       }
       ready() {
@@ -38,13 +38,24 @@
         this.addEventListener('selected', e => this._selectedListener(e));
       }    
       _selectedListener(e){
-        this.$.request.generateRequest();
+        if(!this.title){
+          this.$.request.generateRequest();
+        } else {
+          this._fireTitleChangeEvent();
+        }
+      }
+      _fireTitleChangeEvent(){
+        this.dispatchEvent(new CustomEvent("title-change", {detail:{title:this.title}}));
       }
       _handlePlaylistResponse(response){
         var response = response.detail.__data.response; // this seems like the wrong way to access the data
         this.items = response.items;
         this.title = response.title;
-      };
+        this._fireTitleChangeEvent();
+      }
+      _encodeKey(key){
+        return encodeURIComponent(key);
+      }
     }
     window.customElements.define(PlaylistView.is, PlaylistView);
   </script>

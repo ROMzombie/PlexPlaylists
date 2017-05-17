@@ -12,6 +12,7 @@
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="playlist-view.html">
+<link rel="import" href="home-view.html">
 <link rel="import" href="icons.html">
 
 <dom-module id="plex-playlists">
@@ -61,10 +62,10 @@
     <app-location route="{{route}}"></app-location>
     <app-route route="{{route}}" pattern="/:page/:id" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
-    <app-drawer-layout fullbleed="">
+    <app-drawer-layout fullbleed="" id="layout">
       <!-- Drawer content -->
       <app-drawer id="drawer" slot="drawer">
-        <app-toolbar>Plex Playlists</app-toolbar>
+        <app-toolbar>Playlists on [[serverInfo.serverName]]</app-toolbar>
         <iron-selector class="drawer-list" role="navigation">
           <template is="dom-repeat" items="[[playlists]]" as="playlist">
             <a href="/playlist/[[playlist.ratingKey]]">[[_trimPlaylistTitle(playlist.title)]]</a>
@@ -78,14 +79,14 @@
         <app-header slot="header" condenses="" reveals="" effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="icons:menu" drawer-toggle=""></paper-icon-button>
-            <div main-title="">Movies</div>
+            <div main-title="">[[_trimPlaylistTitle(playlistTitle)]]</div>
           </app-toolbar>
         </app-header>
 
         <iron-pages id="pages" selected="[[playlistKey]]" attr-for-selected="id" fallback-selection="homeView" role="main">
           <home-view id="homeView"></home-view>
           <template is="dom-repeat" items="[[playlists]]" as="playlist">
-            <playlist-view id$="/playlist/[[playlist.ratingKey]]" playlist-id="[[playlist.ratingKey]]"></playlist-view>
+            <playlist-view id$="/playlist/[[playlist.ratingKey]]" server-info="[[serverInfo]]" playlist-id="[[playlist.ratingKey]]" on-title-change="_updatePlaylistTitle"></playlist-view>
           </template>
         </iron-pages>
       </app-header-layout>
@@ -99,9 +100,8 @@
 
       static get properties() {
         return {
-          playlistKey: {
-            type: String
-          }
+          playlistKey: { type: String },
+          playlistTitle: { type: String }
         };
       }
 
@@ -109,6 +109,11 @@
         return [
           '_routePlaylistIdChanged(routeData.id)'
         ];
+      }
+
+      ready(){
+        super.ready();
+        Polymer.dom(this.root).querySelector("#drawer").open();
       }
 
       _trimPlaylistTitle(title) {
@@ -133,6 +138,10 @@
           this.$.drawer.close();
         }
       }      
+
+      _updatePlaylistTitle(e){
+        this.playlistTitle = e.detail.title;
+      }
     }
 
     window.customElements.define(PlexPlaylists.is, PlexPlaylists);
