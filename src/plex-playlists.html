@@ -19,8 +19,9 @@
   <template>
     <style>
       :host {
-        --app-primary-color: #5e5e5e;
-        --app-secondary-color: black;
+        --app-primary-color: #333;
+        --app-secondary-color: #5e5e5e;
+        --app-tertiarty-color: black;
 
         display: block;
       }
@@ -30,7 +31,7 @@
       }
 
       app-header {
-        color: #333333;
+        color: #fff;
         background-color: var(--app-primary-color);
       }
 
@@ -56,6 +57,19 @@
       }
     </style>
 
+    <app-location route="{{route}}"></app-location>
+    <app-route
+      route="{{route}}"
+      pattern="/:page"
+      data="{{routeData}}"
+      tail="{{subroute}}"
+    ></app-route>
+    <app-route
+      route="{{subroute}}"
+      pattern="/:id"
+      data="{{subrouteData}}"
+    ></app-route>
+
     <iron-ajax
       auto
       url="/api/playlists"
@@ -67,18 +81,11 @@
       last-response="{{serverInfo}}"
     ></iron-ajax>
 
-    <app-location route="{{route}}"></app-location>
-    <app-route
-        route="{{route}}"
-        pattern="/:page/:id"
-        data="{{routeData}}"
-        tail="{{subroute}}"></app-route>
-
     <app-drawer-layout fullbleed id="layout">
       <!-- Drawer content -->
       <app-drawer id="drawer" slot="drawer">
         <app-toolbar>Playlists on [[serverInfo.serverName]]</app-toolbar>
-        <iron-selector class="drawer-list" role="navigation">
+        <iron-selector selected="{{route}}" attr-for-selected="href" class="drawer-list" role="navigation">
           <template is="dom-repeat" items="[[playlists]]" as="playlist">
             <a href="/playlist/[[playlist.ratingKey]]">[[_trimPlaylistTitle(playlist.title)]]</a>
           </template>
@@ -128,7 +135,8 @@
 
       static get observers() {
         return [
-          '_routePlaylistIdChanged(routeData.id)'
+          '_routePlaylistIdChanged(subrouteData.id)',
+          '_playlistsChanged(playlists.splices)',
         ];
       }
 
@@ -146,8 +154,7 @@
           : 'homeView';
 
         if(this.playlistKey != 'homeView'){
-          Polymer.dom(this.root).querySelector("[id='"+this.playlistKey+"']")
-            .dispatchEvent(new CustomEvent("selected"));
+	  this._playlistSelected();
         }
 
         if (!this.$.drawer.persistent) {
@@ -157,6 +164,16 @@
 
       _updatePlaylistTitle(e){
         this.playlistTitle = e.detail.title;
+      }
+
+      _playlistSelected() {
+        var playlistView = Polymer.dom(this.root).querySelector("[id='"+this.playlistKey+"']");
+        playlistView && playlistView.dispatchEvent(new CustomEvent("selected"));
+      }
+
+      _playlistsChanged() {
+	this.$.drawer.open();
+        this.subrouteData.id && this._routePlaylistIdChanged(this.subrouteData.id);
       }
     }
 

@@ -16,10 +16,9 @@ var	config = require("./config"),
 
 app.set("view engine", "pug");
 
+// Serve static files
 app.use(express.static('build/default'));
-app.get('/playlist/:id', function(req, res){
-	res.redirect('/');
-});
+app.use(express.static('images'));
 
 app.get("/api/server", function(req, res){
 	res.json({
@@ -48,6 +47,11 @@ app.get("/api/image", function(req,res){
 		res.write(result);
 		res.end();
 	});
+});
+
+// Allow Polymer routing
+app.get('*', function(req, res){ 
+  res.sendFile("build/default/index.html", {root: '.'});
 });
 
 app.listen(config.service_port);
