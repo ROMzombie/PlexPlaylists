@@ -15,5 +15,5 @@
 3. polymer build
 
 ## Screenshots
-![Playlists](http://i.imgur.com/vSZ8i82.png)
-![Playlist Items](http://i.imgur.com/vSZ8i82.png)
+![Desktop](http://i.imgur.com/JjhH8wh.png)
+![Mobile](http://i.imgur.com/tR7JXIK.png)
