@@ -7,16 +7,32 @@
     <style include="shared-styles">
       :host {
         display: block;
-
         padding: 10px;
       }
-      .card { display: inline-block; width: 88px; height: 140px; }
+      .card { 
+        display: inline-block; 
+        width: 88px; 
+        height: 140px; 
+        position: relative;
+      }
+      .card > span {
+        position: absolute;
+        display: block;
+        top: 175px;
+        color: black;
+        font-size: x-small;
+        width: 120px;
+        left: 0px;
+        text-align: center;
+      }
     </style>
     <iron-ajax id="request" url="/api/playlist/[[playlistId]]" handle-as="json" on-response="_handlePlaylistResponse"></iron-ajax>
 
     <template is="dom-repeat" items="[[items]]" as="item" index-as="itemNumber">
-      <a target="_blank" href="https://app.plex.tv/web/app#!/server/[[serverInfo.serverId]]/details?key=[[_encodeKey(item.key)]]"><div class="card" style="background-image:url('/api/image?key=[[item.thumb]]');background-size:cover;">
-          <!-- <div class="circle">[[itemNumber]]</div><h1>[[item.title]]</h1> -->
+      <a target="_blank" href="https://app.plex.tv/web/app#!/server/[[serverInfo.serverId]]/details?key=[[_encodeKey(item.key)]]"><div class="card" style="background-image:url('/api/image?key=[[_thumbToUse(item)]]');background-size:cover;">
+          <template is="dom-if" if="[[_isEpisode(item)]]">
+            <span>[[item.title]]</span>
+          </template>
         </div></a>
     </template>
   </template>
@@ -55,6 +71,15 @@
       }
       _encodeKey(key){
         return encodeURIComponent(key);
+      }
+      _thumbToUse(item){
+        return this._isEpisode(item) ? 
+          item.parentThumb ? 
+            item.parentThumb : 
+            item.grandparentThumb : item.thumb;
+      }
+      _isEpisode(item){
+        return item.type == 'episode';
       }
     }
     window.customElements.define(PlaylistView.is, PlaylistView);
