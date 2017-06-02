@@ -11,6 +11,7 @@
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="loading-spinner.html">
 <link rel="import" href="playlist-view.html">
 <link rel="import" href="home-view.html">
 <link rel="import" href="icons.html">
@@ -26,17 +27,22 @@
         display: block;
       }
 
-      app-drawer-layout:not([narrow]) [drawer-toggle] {
-        display: none;
-      }
-
       app-header {
         color: #fff;
         background-color: var(--app-primary-color);
       }
 
+      app-header > * {
+        display: inline-block;
+      }
+
       app-header paper-icon-button {
+        color: white;
         --paper-icon-button-ink-color: white;
+      }
+
+      app-header h1 {
+        display: inline-block;
       }
 
       .drawer-list {
@@ -59,40 +65,30 @@
 
     <app-location route="{{route}}"></app-location>
     <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
-    <app-route route="{{subroute}}" pattern="/:id" data="{{subrouteData}}"></app-route>
+    <app-route route="{{subroute}}" pattern="/:playlistId" data="{{subrouteData}}"></app-route>
 
     <iron-ajax auto="" url="/api/playlists" last-response="{{playlists}}"></iron-ajax>
     <iron-ajax auto="" url="/api/server" last-response="{{serverInfo}}"></iron-ajax>
 
-    <app-drawer-layout fullbleed="" id="layout">
-      <!-- Drawer content -->
-      <app-drawer id="drawer" slot="drawer">
-        <app-toolbar>Playlists on [[serverInfo.serverName]]</app-toolbar>
-        <iron-selector selected="{{route}}" attr-for-selected="href" class="drawer-list" role="navigation">
-          <template is="dom-repeat" items="[[playlists]]" as="playlist">
-            <a href="/playlist/[[playlist.ratingKey]]">[[_trimPlaylistTitle(playlist.title)]]</a>
-          </template>
-        </iron-selector>
-      </app-drawer>
+    <loading-spinner with-backdrop="" opened="[[isLoading]]"></loading-spinner>
 
-      <!-- Main content -->
-      <app-header-layout has-scrolling-region="">
+    <!-- Main content -->
+    <app-header-layout fullbleed="">
+      <app-header slot="header" condenses="" reveals="" effects="waterfall">
+  
+        <template is="dom-if" if="[[!_isHomeView(routeData.page)]]">
+          <a href="/">
+            <paper-icon-button icon="icons:arrow-back"></paper-icon-button>
+          </a>
+        </template>
+        <div main-title=""><h1>[[pageHeader]]</h1></div>
+      </app-header>
 
-        <app-header slot="header" condenses="" reveals="" effects="waterfall">
-          <app-toolbar>
-            <paper-icon-button icon="icons:menu" drawer-toggle=""></paper-icon-button>
-            <div main-title="">[[_trimPlaylistTitle(playlistTitle)]]</div>
-          </app-toolbar>
-        </app-header>
-
-        <iron-pages id="pages" selected="[[playlistKey]]" attr-for-selected="id" fallback-selection="homeView" role="main">
-          <home-view id="homeView"></home-view>
-          <template is="dom-repeat" items="[[playlists]]" as="playlist">
-            <playlist-view id$="/playlist/[[playlist.ratingKey]]" server-info="[[serverInfo]]" playlist-id="[[playlist.ratingKey]]" on-title-change="_updatePlaylistTitle"></playlist-view>
-          </template>
-        </iron-pages>
-      </app-header-layout>
-    </app-drawer-layout>
+      <iron-pages id="pages" selected="[[routeData.page]]" attr-for-selected="name" fallback-selection="homeView" role="main">
+        <home-view name="homeView" playlists="[[playlists]]"></home-view>
+        <playlist-view name="playlist" server-info="[[serverInfo]]" playlist-id="[[subrouteData.playlistId]]" playlist-title="{{playlistTitle}}" is-loading="{{isLoading}}"></playlist-view>
+      </iron-pages>
+    </app-header-layout>
   </template>
 
   <script>
@@ -102,53 +98,31 @@
 
       static get properties() {
         return {
-          playlistKey: { type: String },
           playlistTitle: { type: String }
         };
       }
 
       static get observers() {
         return [
-          '_routePlaylistIdChanged(subrouteData.id)',
-          '_playlistsChanged(playlists.splices)',
+          "_setPageHeader(serverInfo, playlistTitle, routeData.page)"
         ];
+      }
+
+      _setPageHeader() {
+        this.pageHeader = 
+          this.routeData.page == 'playlist' && this.playlistTitle ? 
+            this._trimPlaylistTitle(this.playlistTitle) :
+            "Plex Playlists" + (this.serverInfo?" on "+this.serverInfo.serverName:"");
       }
 
       _trimPlaylistTitle(title) {
         return String(title).substring(1);
       }
 
-      _routePlaylistIdChanged(playlistId) {
-        if (playlistId === undefined) {
-          return;
-        }
-
-        this.playlistKey = playlistId && playlistId.length > 0 
-          ? '/playlist/'+playlistId
-          : 'homeView';
-
-        if(this.playlistKey != 'homeView'){
-	  this._playlistSelected();
-        }
-
-        if (!this.$.drawer.persistent) {
-          this.$.drawer.close();
-        }
-      }      
-
-      _updatePlaylistTitle(e){
-        this.playlistTitle = e.detail.title;
+      _isHomeView() {
+        return this.routeData.page != 'playlist';
       }
 
-      _playlistSelected() {
-        var playlistView = Polymer.dom(this.root).querySelector("[id='"+this.playlistKey+"']");
-        playlistView && playlistView.dispatchEvent(new CustomEvent("selected"));
-      }
-
-      _playlistsChanged() {
-	this.$.drawer.open();
-        this.subrouteData.id && this._routePlaylistIdChanged(this.subrouteData.id);
-      }
     }
 
     window.customElements.define(PlexPlaylists.is, PlexPlaylists);

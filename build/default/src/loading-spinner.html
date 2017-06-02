@@ -1,0 +1,36 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/iron-overlay-behavior/iron-overlay-behavior.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="loading-spinner">
+  <template>
+    <style include="shared-styles">
+      :host {
+        --iron-overlay-backdrop-opacity: .8;
+      }
+      paper-spinner {
+        --paper-spinner-stroke-width: 10px;
+        width: 200px;
+        height: 200px;
+      }
+    </style>
+
+    <paper-spinner active=""></paper-spinner>
+  </template>
+
+  <script>
+    class LoadingSpinner extends Polymer.mixinBehaviors([
+      Polymer.IronOverlayBehavior  
+    ],Polymer.Element) {
+      
+      static get is() { return 'loading-spinner'; }
+
+      static get propertites () { 
+        return {};
+      }
+    }
+
+    window.customElements.define(LoadingSpinner.is, LoadingSpinner);
+  </script>
+</dom-module>

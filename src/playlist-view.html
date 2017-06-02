@@ -18,27 +18,44 @@
       .card > span {
         position: absolute;
         display: block;
-        top: 175px;
-        color: black;
-        font-size: x-small;
-        width: 120px;
-        left: 0px;
+        font-size: small;
         text-align: center;
+      }
+      .card > span.title {
+        top: 175px;
+        left: 0px;
+        color: white;
+        font-weight: bold;
+        width: 120px;
+      }
+      .card > span.number {
+        top: 151px;
+        left: 99px;
+        color: white;
+        background: #232323;
+        font-weight: bolder;
+        width: 20px;
+        height: 20px;
+        border-radius: 15px;
       }
     </style>
     <iron-ajax id="request"
       url="/api/playlist/[[playlistId]]"
       handle-as="json"
       on-response="_handlePlaylistResponse"
+      auto
+      loading="{{isLoading}}"
     ></iron-ajax>
+    
 
     <template is="dom-repeat" items="[[items]]" as="item" index-as="itemNumber">
       <a target="_blank" 
         href="https://app.plex.tv/web/app#!/server/[[serverInfo.serverId]]/details?key=[[_encodeKey(item.key)]]"><div 
         class="card" style="background-image:url('/api/image?key=[[_thumbToUse(item)]]');background-size:cover;">
           <template is="dom-if" if="[[_isEpisode(item)]]">
-            <span>[[item.title]]</span>
+            <span class="title">[[item.title]]</span>
           </template>
+          <span class="number">[[_formatItemNumber(itemNumber)]]</span>
         </div></a>
     </template>
   </template>
@@ -50,42 +67,38 @@
       static get properties() {
         return { 
           playlistId: { type: String },
-          title: { type: String },
+          playlistTitle: { type: String, notify: true },
           items: { type: Array },
-          serverInfo: { type: Object }
+          serverInfo: { type: Object },
+          isLoading: { type: Boolean, notify: true }
         }
-      }
-      ready() {
-        super.ready();
-        this.addEventListener('selected', e => this._selectedListener(e));
-      }    
-      _selectedListener(e){
-        if(!this.title){
-          this.$.request.generateRequest();
-        } else {
-          this._fireTitleChangeEvent();
-        }
-      }
-      _fireTitleChangeEvent(){
-        this.dispatchEvent(new CustomEvent("title-change", {detail:{title:this.title}}));
-      }
+      }       
+
       _handlePlaylistResponse(response){
         var response = response.detail.__data.response; // this seems like the wrong way to access the data
-        this.items = response.items;
-        this.title = response.title;
-        this._fireTitleChangeEvent();
+        if(response){
+          this.items = response.items;
+          this.playlistTitle = response.title;
+        }
       }
+
       _encodeKey(key){
         return encodeURIComponent(key);
       }
+
       _thumbToUse(item){
         return this._isEpisode(item) ? 
           item.parentThumb ? 
             item.parentThumb : 
             item.grandparentThumb : item.thumb;
       }
+
       _isEpisode(item){
         return item.type == 'episode';
+      }
+
+      _formatItemNumber(itemNumber){
+        return itemNumber+1;
       }
     }
     window.customElements.define(PlaylistView.is, PlaylistView);

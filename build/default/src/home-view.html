@@ -9,16 +9,36 @@
 
         padding: 10px;
       }
+      a, a:hover, a:visited, a:active, a:link { text-decoration: none };
+      .card {
+        width: 300px;
+        display: inline-block;
+      }
     </style>
 
     <div>
-      
+      <template is="dom-repeat" items="[[playlists]]" as="playlist">
+        <a href="/playlist/[[playlist.ratingKey]]"><div class="card">
+          <h1>[[_trimPlaylistTitle(playlist.title)]]</h1>
+          <p>[[playlist.summary]]</p>
+        </div></a>
+      </template>
     </div>
   </template>
 
   <script>
     class HomeView extends Polymer.Element {
       static get is() { return 'home-view'; }
+
+      static get propertites () { 
+        return {
+          playlists: { type: Array }
+        };
+      }
+
+      _trimPlaylistTitle(title) {
+        return String(title).substring(1);
+      }
     }
 
     window.customElements.define(HomeView.is, HomeView);

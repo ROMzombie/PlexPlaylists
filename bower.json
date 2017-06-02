@@ -14,11 +14,17 @@
     "paper-icon-button": "PolymerElements/paper-icon-button#2.0-preview",
     "polymer": "Polymer/polymer#^2.0.0-rc.3",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0-rc.7",
-    "iron-ajax": "PolymerElements/iron-ajax#^2.0.0"
+    "iron-ajax": "PolymerElements/iron-ajax#^2.0.0",
+    "paper-spinner": "PolymerElements/paper-spinner#^2.0.0",
+    "iron-overlay-behavior": "PolymerElements/iron-overlay-behavior#^2.0.0"
   },
   "resolutions": {
     "polymer": "^2.0.0-rc.3",
-    "test-fixture": "^3.0.0-rc.1"
+    "test-fixture": "^3.0.0-rc.1",
+    "iron-resizable-behavior": "1 - 2",
+    "iron-flex-layout": "1 - 2",
+    "iron-a11y-keys-behavior": "1 - 2",
+    "paper-styles": "1 - 2"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0-prerelease.7"
