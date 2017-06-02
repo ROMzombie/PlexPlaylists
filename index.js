@@ -41,6 +41,15 @@ app.get("/api/playlist/:id", function(req, res){
 	});
 });
 
+app.get("/api/playlist/:id/thumbnail", function(req, res){
+	var timestamp = Math.round((new Date()).getTime() / 1000);
+	getImageFromPlexPy("/playlists/"+req.params.id+"/composite/"+timestamp).then(function(result){
+		res.setHeader("content-type","image/jpg");
+		res.write(result);
+		res.end();
+	});
+});
+
 app.get("/api/image", function(req,res){
 	getImageFromPlexPy(req.query.key).then(function(result){
 		res.setHeader("content-type","image/jpg");

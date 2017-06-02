@@ -10,8 +10,13 @@
         padding: 10px;
       }
       a, a:hover, a:visited, a:active, a:link { text-decoration: none };
+      .card-image {
+	width: 230px; 
+        height: 230px;
+        margin: 0 auto;
+      }
       .card {
-        width: 300px;
+        width: 250px;
         display: inline-block;
       }
     </style>
@@ -19,8 +24,10 @@
     <div>
       <template is="dom-repeat" items="[[playlists]]" as="playlist">
         <a href="/playlist/[[playlist.ratingKey]]"><div class="card">
-          <h1>[[_trimPlaylistTitle(playlist.title)]]</h1>
-          <p>[[playlist.summary]]</p>
+          <div class="card-image"
+             style="background-image: url('/api/playlist/[[playlist.ratingKey]]/thumbnail');background-size: contain;">&nbsp;
+          </div>
+          <h3>[[_trimPlaylistTitle(playlist.title)]]</h3>
         </div></a>
       </template>
     </div>
