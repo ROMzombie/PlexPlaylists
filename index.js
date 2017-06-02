@@ -15,8 +15,8 @@ var	config = require("./config"),
 			product: "Plex Playlists" 
 		} });
 
-var 	PLAYLIST_CACHE_DURATION = 100*60*60, // 1h
-	IMAGE_CACHE_DURATION = 100*60*60*24; // 24h 
+var 	PLAYLIST_CACHE_DURATION = 1000*60*60, // 1h
+	IMAGE_CACHE_DURATION = 1000*60*60*24; // 24h 
 
 app.set("view engine", "pug");
 
