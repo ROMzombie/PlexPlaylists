@@ -3,6 +3,7 @@ var	config = require("./config"),
 	express = require("express"),
 	app = express(),
  	PlexAPI = require("plex-api"),
+	cache = require("memory-cache"),
 	api = new PlexAPI({ 
 		hostname: config.plex_address, 
 		username: config.plex_username, 
@@ -13,6 +14,9 @@ var	config = require("./config"),
 			identifier: "plex-playlists",
 			product: "Plex Playlists" 
 		} });
+
+var 	PLAYLIST_CACHE_DURATION = 100*60*60, // 1h
+	IMAGE_CACHE_DURATION = 100*60*60*24; // 24h 
 
 app.set("view engine", "pug");
 
@@ -66,13 +70,19 @@ app.get('*', function(req, res){
 app.listen(config.service_port);
 
 function getPlaylists() {
-	return api.query("/playlists").then(function(result){  
-		return result.MediaContainer.Metadata.filter(function(entry){
+	var cachedPlaylists = cache.get("playlists");
+	if(cachedPlaylists){
+		return Promise.resolve(cachedPlaylists);
+	} else {
+		return api.query("/playlists").then(function(result){  
+		  var results = result.MediaContainer.Metadata.filter(function(entry){
 			return entry.title.startsWith(config.prefix);
+		  });
+		  cache.put("playlists", results, PLAYLIST_CACHE_DURATION);
+		}, function(error){
+		  console.error("Could not connect to server", error) 
 		});
-	}, function(error){
-		console.error("Could not connect to server", error) 
-	});	
+	}	
 }
 
 function getPlaylistItems (id) {
@@ -80,25 +90,43 @@ function getPlaylistItems (id) {
 	
 	var key = "/playlists/" + id + "/items";
 
-	return api.query(key).then(function(result){               
-		return { 
+	var cachedPlaylist = cache.get("playlist_"+key);
+	if(cachedPlaylist) {
+		return Promise.resolve(cachedPlaylist);
+	} else {
+		return api.query(key).then(function(result){               
+		  var result = { 
 			title: result.MediaContainer.title,
 			items: result.MediaContainer.Metadata 
-		};
-	}, function(error){
-		console.error("Could not get playlist entries");
-	});	
+		  };
+		  cache.put("playlist_"+key, result, PLAYLIST_CACHE_DURATION);
+		  return result;
+		}, function(error){
+		  console.error("Could not get playlist entries");
+		});
+	}	
 }
 
 function getImageFromPlexPy(key) {
-	return new Promise(function(resolve, reject){
-		var url = "http://" 
+	var cacheKey = key;
+	if(cacheKey.startsWith('/playlists')){
+		cacheKey = /(.*\/composite\/)/i.exec(key)[0]; 
+	}
+	var cachedImage = cache.get("image_"+cacheKey);
+	if(cachedImage){
+		return Promise.resolve(cachedImage);
+	} else {
+		return new Promise(function(resolve, reject){
+		  var url = "http://" 
 			+ config.plexpy_address + ":" + config.plexpy_port 
 			+ "/api/v2?apikey=" + config.plexpy_apikey 
 			+ "&cmd=pms_image_proxy&img=" + key
 			+ "&fallback=poster"
-		http.get(url, function(error, response){
-			resolve(response.buffer);
+		  http.get(url, function(error, response){
+			var buffer = response.buffer;
+			cache.put("image_"+cacheKey, buffer, IMAGE_CACHE_DURATION);	
+			resolve(buffer);
+		  });
 		});
-	});
+	}
 }

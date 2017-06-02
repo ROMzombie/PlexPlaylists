@@ -4,7 +4,9 @@
   "description": "A node package to share Plex playlists",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint . --ext js,html --ignore-path .gitignore",
+    "test": "npm run lint && polymer test",
+    "build": "polymer build"
   },
   "keywords": [
     "plex"
@@ -14,6 +16,7 @@
   "dependencies": {
     "express": "^4.15.2",
     "http-request": "^0.7.0",
+    "memory-cache": "^0.1.6",
     "plex-api": "^5.1.0",
     "pug": "^2.0.0-rc.1"
   },
@@ -21,10 +24,5 @@
     "eslint": "^3.12.0",
     "eslint-config-google": "^0.7.1",
     "eslint-plugin-html": "^1.7.0"
-  },
-  "scripts": {
-    "lint": "eslint . --ext js,html --ignore-path .gitignore",
-    "test": "npm run lint && polymer test",
-    "build": "polymer build"
   }
 }
