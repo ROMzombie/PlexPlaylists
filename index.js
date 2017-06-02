@@ -79,6 +79,7 @@ function getPlaylists() {
 			return entry.title.startsWith(config.prefix);
 		  });
 		  cache.put("playlists", results, PLAYLIST_CACHE_DURATION);
+		  return results;
 		}, function(error){
 		  console.error("Could not connect to server", error) 
 		});
