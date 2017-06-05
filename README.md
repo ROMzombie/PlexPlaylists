@@ -6,6 +6,12 @@
    (populate it with your configuration settings)
 3. npm install
 
+## Usage
+Add playlists to your server annotated by a '@' to share them. You can also specify a category via one of these terms (dynamic, collection, filmography or organized), seperated from the playlist title by a pipe character (|).  
+For example, in the screenshots below, the name for the first playlist is "@collection|Tom's Favorites".
+
+The application uses an in-memory cache to prevent successive hits to PlexPy (for images) and the Plex server within a period of a few hours.
+
 ## Running
 1. nodejs .
 
