@@ -1,4 +1,10 @@
 # PlexPlaylists
+A tool for sharing curated content via a Plex server.
+
+## Dependencies
+1. A Plex server
+2. A PlexPy server connected to that Plex server
+3. NodeJS
 
 ## Setup
 1. cp _config.json config.json 
