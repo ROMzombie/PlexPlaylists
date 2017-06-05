@@ -116,7 +116,10 @@
       }
 
       _trimPlaylistTitle(title) {
-        return String(title).substring(1);
+        title = String(title);
+        return title.indexOf("|") == -1 ?
+          title.substring(1) :
+          /\|(.*)$/.exec(title)[1];
       }
 
       _isHomeView() {

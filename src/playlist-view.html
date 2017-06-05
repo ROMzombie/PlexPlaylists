@@ -40,14 +40,14 @@
         border-radius: 15px;
       }
     </style>
+
     <iron-ajax id="request"
       url="/api/playlist/[[playlistId]]"
       handle-as="json"
       on-response="_handlePlaylistResponse"
       auto
       loading="{{isLoading}}"
-    ></iron-ajax>
-    
+    ></iron-ajax>  
 
     <template is="dom-repeat" items="[[items]]" as="item" index-as="itemNumber">
       <a target="_blank" 

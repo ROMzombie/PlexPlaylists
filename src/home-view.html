@@ -13,21 +13,66 @@
       .card-image {
 	width: 230px; 
         height: 230px;
+        border: 1px solid white;
+        border-radius: 25%;
         margin: 0 auto;
       }
       .card {
         width: 250px;
         display: inline-block;
+        padding: 5px;
+      }
+      .card > div {
+        padding: 10px;
+        background: white;
+        border-radius: 5px;
+      }
+      .card-title {
+        width: 95%;
+        text-align: center;
+        font-weight: bold;
+        color: #333333;
+        margin-top: 15px; 
+      }
+      .collection { 
+        background: rgb(242,245,246); 
+        background: -moz-linear-gradient(top, rgba(242,245,246,1) 0%, rgba(227,234,237,1) 37%, rgba(200,215,220,1) 100%); 
+        background: -webkit-linear-gradient(top, rgba(242,245,246,1) 0%,rgba(227,234,237,1) 37%,rgba(200,215,220,1) 100%); 
+        background: linear-gradient(to bottom, rgba(242,245,246,1) 0%,rgba(227,234,237,1) 37%,rgba(200,215,220,1) 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f2f5f6', endColorstr='#c8d7dc',GradientType=0 );
+      }
+      .filmography { 
+        background: rgb(252,234,187); 
+        background: -moz-linear-gradient(top, rgba(252,234,187,1) 0%, rgba(252,205,77,1) 50%, rgba(248,181,0,1) 51%, rgba(251,223,147,1) 100%); 
+        background: -webkit-linear-gradient(top, rgba(252,234,187,1) 0%,rgba(252,205,77,1) 50%,rgba(248,181,0,1) 51%,rgba(251,223,147,1) 100%); 
+        background: linear-gradient(to bottom, rgba(252,234,187,1) 0%,rgba(252,205,77,1) 50%,rgba(248,181,0,1) 51%,rgba(251,223,147,1) 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fceabb', endColorstr='#fbdf93',GradientType=0 );
+      }
+      .dynamic {
+        background: rgb(122,188,255); 
+        background: -moz-linear-gradient(top, rgba(122,188,255,1) 0%, rgba(96,171,248,1) 44%, rgba(64,150,238,1) 100%); 
+        background: -webkit-linear-gradient(top, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%); 
+        background: linear-gradient(to bottom, rgba(122,188,255,1) 0%,rgba(96,171,248,1) 44%,rgba(64,150,238,1) 100%); 
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7abcff', endColorstr='#4096ee',GradientType=0 ); 
+      }
+      .organized { 
+        background: rgb(246,248,249); 
+        background: -moz-linear-gradient(top, rgba(246,248,249,1) 0%, rgba(229,235,238,1) 50%, rgba(215,222,227,1) 51%, rgba(245,247,249,1) 100%); 
+        background: -webkit-linear-gradient(top, rgba(246,248,249,1) 0%,rgba(229,235,238,1) 50%,rgba(215,222,227,1) 51%,rgba(245,247,249,1) 100%); 
+        background: linear-gradient(to bottom, rgba(246,248,249,1) 0%,rgba(229,235,238,1) 50%,rgba(215,222,227,1) 51%,rgba(245,247,249,1) 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f6f8f9', endColorstr='#f5f7f9',GradientType=0 ); 
       }
     </style>
 
     <div>
       <template is="dom-repeat" items="[[playlists]]" as="playlist">
-        <a href="/playlist/[[playlist.ratingKey]]"><div class="card">
-          <div class="card-image"
-             style="background-image: url('/api/playlist/[[playlist.ratingKey]]/thumbnail');background-size: contain;">&nbsp;
+        <a href="/playlist/[[playlist.ratingKey]]"><div class$="card [[_getPlaylistClassFromTitle(playlist.title)]]">
+          <div>
+            <div class="card-image"
+              style="background-image: url('/api/playlist/[[playlist.ratingKey]]/thumbnail');background-size: contain;">&nbsp;
+            </div>
+            <div class="card-title">[[_trimPlaylistTitle(playlist.title)]]</div>
           </div>
-          <h3>[[_trimPlaylistTitle(playlist.title)]]</h3>
         </div></a>
       </template>
     </div>
@@ -43,8 +88,15 @@
         };
       }
 
-      _trimPlaylistTitle(title) {
-        return String(title).substring(1);
+      _trimPlaylistTitle(title) {        
+	title = String(title);
+        return title.indexOf("|") == -1 ? 
+          title.substring(1) : 
+          /\|(.*)$/.exec(title)[1];
+      }
+
+      _getPlaylistClassFromTitle(title) {
+        return /^@?(\w+)\|.*$/.exec(title)[1] || "";
       }
     }
 

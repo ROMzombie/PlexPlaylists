@@ -40,8 +40,8 @@
         border-radius: 15px;
       }
     </style>
-    <iron-ajax id="request" url="/api/playlist/[[playlistId]]" handle-as="json" on-response="_handlePlaylistResponse" auto="" loading="{{isLoading}}"></iron-ajax>
-    
+
+    <iron-ajax id="request" url="/api/playlist/[[playlistId]]" handle-as="json" on-response="_handlePlaylistResponse" auto="" loading="{{isLoading}}"></iron-ajax>  
 
     <template is="dom-repeat" items="[[items]]" as="item" index-as="itemNumber">
       <a target="_blank" href="https://app.plex.tv/web/app#!/server/[[serverInfo.serverId]]/details?key=[[_encodeKey(item.key)]]"><div class="card" style="background-image:url('/api/image?key=[[_thumbToUse(item)]]');background-size:cover;">
