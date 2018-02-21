@@ -3,17 +3,23 @@ var	config = require("./config"),
 	express = require("express"),
 	app = express(),
  	PlexAPI = require("plex-api"),
+	PlexAPICredentials = require("plex-api-credentials"),
 	cache = require("memory-cache"),
+	plexAPICredentials = PlexAPICredentials({
+		username: config.plex_username,
+		password: config.plex_password
+	}),
 	api = new PlexAPI({ 
 		hostname: config.plex_address, 
-		username: config.plex_username, 
-		password: config.plex_password,
+		authenticator: plexAPICredentials,
 		port: config.plex_port,
 		options: { 
 			deviceName: "Plex Playlists",
 			identifier: "plex-playlists",
 			product: "Plex Playlists" 
-		} });
+		} 
+	}),
+	plexTvApi = null;
 
 var 	PLAYLIST_CACHE_DURATION = 1000*60*60, // 1h
 	IMAGE_CACHE_DURATION = 1000*60*60*24; // 24h 
@@ -62,12 +68,42 @@ app.get("/api/image", function(req,res){
 	});
 });
 
+app.get("/api/users", function(req,res){
+	plexTv.query("/api/users").then(function(result){
+		res.json(result);
+	});
+});
+
 // Allow Polymer routing
 app.get('*', function(req, res){ 
-  res.sendFile("build/default/index.html", {root: '.'});
+	res.sendFile("build/default/index.html", {root: '.'});
 });
 
 app.listen(config.service_port);
+
+plexAPICredentials.on("token", function(token){
+	console.log("Retrieved Plex API Token: ", token);
+	plexTvApi = new PlexAPI({
+		hostname: "https://plex.tv",
+		https: true,
+		port: 443, 
+		token: token,
+		options: { 
+			deviceName: "Plex Playlists",
+			identifier: "plex-playlists",
+			product: "Plex Playlists" 
+		} 
+	});	
+	plexTvApi.query({
+		uri: "/api/servers",
+		extraHeaders: { 
+			"Accept": "application/json",
+			"X-Plex-Token": token
+		}
+	}).then(function(result){
+		console.log(result);
+	});
+});
 
 function getPlaylists() {
 	var cachedPlaylists = cache.get("playlists");
@@ -124,9 +160,13 @@ function getImageFromPlexPy(key) {
 			+ "&cmd=pms_image_proxy&img=" + key
 			+ "&fallback=poster"
 		  http.get(url, function(error, response){
-			var buffer = response.buffer;
-			cache.put("image_"+cacheKey, buffer, IMAGE_CACHE_DURATION);	
-			resolve(buffer);
+			if(response){
+				var buffer = response.buffer;
+				cache.put("image_"+cacheKey, buffer, IMAGE_CACHE_DURATION);	
+				resolve(buffer);
+			} else {
+				reject();
+			}
 		  });
 		});
 	}

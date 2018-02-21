@@ -18,6 +18,7 @@
     "http-request": "^0.7.0",
     "memory-cache": "^0.1.6",
     "plex-api": "^5.1.0",
+    "plex-api-credentials": "^3.0.0",
     "pug": "^2.0.0-rc.1"
   },
   "devDependencies": {
