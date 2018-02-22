@@ -54,7 +54,7 @@
 
     <template is="dom-repeat" items="[[items]]" as="item" index-as="itemNumber">
       <a target="_blank" 
-        href="https://app.plex.tv/web/app#!/server/[[serverInfo.serverId]]/details?key=[[_encodeKey(item.key)]]"><div 
+        href="https://app.plex.tv/web/app#!/server/[[serverInfo.serverId]]/details?key=[[_encodeKey(item)]]"><div 
         class$="card [[item.type]]" style="background-image:url('/api/image?key=[[_thumbToUse(item)]]');background-size:cover;">
           <template is="dom-if" if="[[_isEpisode(item)]]">
             <span class="title">[[item.title]]</span>
@@ -86,8 +86,10 @@
         }
       }
 
-      _encodeKey(key){
-        return encodeURIComponent(key);
+      _encodeKey(item){
+        return encodeURIComponent(
+          this._isTrack(item) ? item.parentKey : item.key
+        );
       }
 
       _thumbToUse(item){
@@ -99,6 +101,10 @@
 
       _isEpisode(item){
         return item.type == 'episode';
+      }
+
+      _isTrack(item){
+        return item.type == 'track';
       }
 
       _cardClassList(item) {
